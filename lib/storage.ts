@@ -1,8 +1,16 @@
 "use client"
 
 import * as React from "react"
-import type { Habit, Project, Reminder, RoutineBlock, Task } from "./types"
+import type {
+  Event,
+  Habit,
+  Project,
+  Reminder,
+  RoutineBlock,
+  Task,
+} from "./types"
 import {
+  defaultEvents,
   defaultHabits,
   defaultProjects,
   defaultReminders,
@@ -16,6 +24,7 @@ const KEYS = {
   habits: "tasker.habits.v1",
   routine: "tasker.routine.v1",
   reminders: "tasker.reminders.v1",
+  events: "tasker.events.v1",
   seeded: "tasker.seeded.v1",
 } as const
 
@@ -50,6 +59,8 @@ function ensureSeeded() {
     if (!window.localStorage.getItem(KEYS.routine)) write(KEYS.routine, defaultRoutine())
     if (!window.localStorage.getItem(KEYS.reminders))
       write(KEYS.reminders, defaultReminders())
+    if (!window.localStorage.getItem(KEYS.events))
+      write(KEYS.events, defaultEvents())
     window.localStorage.setItem(KEYS.seeded, "1")
   }
   seeded = true
@@ -108,12 +119,14 @@ export function replaceSnapshot(snap: {
   habits: Habit[]
   routine: RoutineBlock[]
   reminders?: Reminder[]
+  events?: Event[]
 }) {
   setStored(KEYS.tasks, snap.tasks, EMPTY_TASKS_REF)
   setStored(KEYS.projects, snap.projects, EMPTY_PROJECTS_REF)
   setStored(KEYS.habits, snap.habits, EMPTY_HABITS_REF)
   setStored(KEYS.routine, snap.routine, EMPTY_ROUTINE_REF)
   setStored(KEYS.reminders, snap.reminders ?? [], EMPTY_REMINDERS_REF)
+  setStored(KEYS.events, snap.events ?? [], EMPTY_EVENTS_REF)
 }
 
 const EMPTY_TASKS_REF: Task[] = []
@@ -121,6 +134,7 @@ const EMPTY_PROJECTS_REF: Project[] = []
 const EMPTY_HABITS_REF: Habit[] = []
 const EMPTY_ROUTINE_REF: RoutineBlock[] = []
 const EMPTY_REMINDERS_REF: Reminder[] = []
+const EMPTY_EVENTS_REF: Event[] = []
 
 export function uid() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -134,6 +148,7 @@ const EMPTY_PROJECTS: Project[] = []
 const EMPTY_HABITS: Habit[] = []
 const EMPTY_ROUTINE: RoutineBlock[] = []
 const EMPTY_REMINDERS: Reminder[] = []
+const EMPTY_EVENTS: Event[] = []
 
 const noopSubscribe = () => () => {}
 
@@ -154,6 +169,7 @@ export function useTasker() {
     KEYS.reminders,
     EMPTY_REMINDERS,
   )
+  const [events, setEvents] = useStored<Event[]>(KEYS.events, EMPTY_EVENTS)
 
   const hydrated = useIsClient()
 
@@ -169,6 +185,8 @@ export function useTasker() {
     setRoutine,
     reminders,
     setReminders,
+    events,
+    setEvents,
   }
 }
 

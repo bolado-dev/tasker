@@ -26,6 +26,11 @@ import { CrisisDialog } from "@/components/dialogs/crisis-dialog"
 import { colorClass, type View } from "@/lib/types"
 import type { Store } from "@/lib/store-types"
 import { daysSince, priorityClasses, todayISO } from "@/lib/format"
+import {
+  expandTasksForDate,
+  setTaskInstanceDone,
+  type TaskInstance,
+} from "@/lib/recurrence"
 
 const QUOTES = [
   "Cada minuto invertido aquí es un minuto que la adicción no te roba.",
@@ -43,7 +48,10 @@ export function OverviewView({
   onNavigate: (v: View) => void
 }) {
   const today = todayISO()
-  const tasksToday = store.tasks.filter((t) => t.dueDate === today)
+  const tasksToday: TaskInstance[] = React.useMemo(
+    () => expandTasksForDate(store.tasks, today),
+    [store.tasks, today],
+  )
   const doneToday = tasksToday.filter((t) => t.done).length
   const progress = tasksToday.length === 0 ? 0 : (doneToday / tasksToday.length) * 100
 
@@ -59,14 +67,17 @@ export function OverviewView({
     return QUOTES[idx]
   }, [])
 
-  function toggleTask(id: string) {
-    store.setTasks((prev) =>
-      prev.map((t) =>
-        t.id === id
-          ? { ...t, done: !t.done, completedAt: !t.done ? Date.now() : undefined }
-          : t,
-      ),
-    )
+  function toggleTask(inst: TaskInstance) {
+    const original = store.tasks.find((t) => t.id === inst.id)
+    if (!original) return
+    const next = setTaskInstanceDone(original, inst.instanceDate || today, !inst.done)
+    store.setTasks((prev) => {
+      const idx = prev.findIndex((x) => x.id === next.id)
+      if (idx === -1) return [...prev, next]
+      const copy = [...prev]
+      copy[idx] = next
+      return copy
+    })
   }
 
   return (
@@ -86,7 +97,7 @@ export function OverviewView({
         </CardHeader>
       </Card>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="animate-stagger grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           icon={<Flame className="size-4" />}
           label="Racha más larga"
@@ -144,14 +155,17 @@ export function OverviewView({
                 }
               />
             ) : (
-              <ul className="divide-foreground/5 divide-y">
+              <ul className="animate-stagger divide-foreground/5 divide-y">
                 {tasksToday.slice(0, 6).map((t) => {
                   const project = store.projects.find((p) => p.id === t.projectId)
                   return (
-                    <li key={t.id} className="flex items-center gap-3 py-2.5">
+                    <li
+                      key={`${t.id}::${t.instanceDate}`}
+                      className="flex items-center gap-3 py-2.5"
+                    >
                       <Checkbox
                         checked={t.done}
-                        onCheckedChange={() => toggleTask(t.id)}
+                        onCheckedChange={() => toggleTask(t)}
                         aria-label={t.title}
                       />
                       <div className="min-w-0 flex-1">
@@ -215,7 +229,7 @@ export function OverviewView({
                     <button
                       key={h.id}
                       onClick={() => onNavigate("habits")}
-                      className="hover:bg-muted -mx-2 flex w-[calc(100%+1rem)] items-center gap-3 rounded-2xl px-2 py-2 text-left transition-colors"
+                      className="hover:bg-muted -mx-2 flex w-[calc(100%+1rem)] cursor-pointer items-center gap-3 rounded-2xl px-2 py-2 text-left transition-all duration-200 ease-out hover:translate-x-0.5 active:scale-[0.99]"
                     >
                       <div className="bg-muted text-muted-foreground flex size-10 items-center justify-center rounded-2xl">
                         <Flame className="size-4" />
@@ -275,7 +289,7 @@ export function OverviewView({
                   <button
                     key={p.id}
                     onClick={() => onNavigate("projects")}
-                    className="bg-muted/50 hover:bg-muted group/proj rounded-2xl p-4 text-left transition-colors"
+                    className="bg-muted/50 hover:bg-muted group/proj cursor-pointer rounded-2xl p-4 text-left transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]"
                   >
                     <div className="flex items-center gap-2">
                       <span className={`size-2.5 rounded-full ${colorClass(p.color)}`} />
@@ -315,10 +329,13 @@ function StatCard({
   unit: string
 }) {
   return (
-    <Card size="sm">
+    <Card
+      size="sm"
+      className="lift-on-hover hover:shadow-[0_2px_4px_rgb(0_0_0/0.04),0_12px_28px_-12px_rgb(0_0_0/0.10)]"
+    >
       <CardContent>
         <div className="flex items-start gap-3">
-          <div className="bg-muted text-muted-foreground flex size-9 shrink-0 items-center justify-center rounded-2xl">
+          <div className="bg-muted text-muted-foreground group-hover/card:bg-primary/10 group-hover/card:text-primary flex size-9 shrink-0 items-center justify-center rounded-2xl transition-colors duration-200">
             {icon}
           </div>
           <div className="min-w-0">

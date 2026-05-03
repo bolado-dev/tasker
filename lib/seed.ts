@@ -1,194 +1,32 @@
-import type { Habit, Project, Reminder, RoutineBlock, Task } from "./types"
-import { computeNextFireAt } from "./reminder"
-
-function todayISO() {
-  const d = new Date()
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, "0")
-  const day = String(d.getDate()).padStart(2, "0")
-  return `${y}-${m}-${day}`
-}
-
-function id() {
-  return Math.random().toString(36).slice(2, 10)
-}
+import type {
+  Event,
+  Habit,
+  Project,
+  Reminder,
+  RoutineBlock,
+  Task,
+} from "./types"
 
 export function defaultProjects(): Project[] {
-  const now = Date.now()
-  return [
-    {
-      id: "proj-salud",
-      name: "Salud y cuerpo",
-      description: "Ejercicio, alimentación y descanso. Tu cuerpo es tu base.",
-      color: "emerald",
-      status: "active",
-      createdAt: now,
-    },
-    {
-      id: "proj-aprender",
-      name: "Aprender algo nuevo",
-      description: "Cursos, libros y skills que ocupen tu mente con cosas que importan.",
-      color: "violet",
-      status: "active",
-      createdAt: now,
-    },
-    {
-      id: "proj-personal",
-      name: "Vida personal",
-      description: "Familia, amistades y momentos que valen la pena.",
-      color: "rose",
-      status: "active",
-      createdAt: now,
-    },
-  ]
+  return []
 }
 
 export function defaultTasks(): Task[] {
-  const today = todayISO()
-  const now = Date.now()
-  return [
-    {
-      id: id(),
-      title: "Salir a caminar 30 minutos",
-      done: false,
-      priority: "high",
-      projectId: "proj-salud",
-      dueDate: today,
-      createdAt: now,
-      notes: "Sin teléfono. Solo tú y el aire.",
-    },
-    {
-      id: id(),
-      title: "Tomar 2 litros de agua",
-      done: false,
-      priority: "med",
-      projectId: "proj-salud",
-      dueDate: today,
-      createdAt: now,
-    },
-    {
-      id: id(),
-      title: "Leer 20 páginas",
-      done: false,
-      priority: "med",
-      projectId: "proj-aprender",
-      dueDate: today,
-      createdAt: now,
-    },
-    {
-      id: id(),
-      title: "Llamar a alguien importante",
-      done: false,
-      priority: "low",
-      projectId: "proj-personal",
-      dueDate: today,
-      createdAt: now,
-    },
-  ]
+  return []
 }
 
 export function defaultHabits(): Habit[] {
-  const now = Date.now()
-  return [
-    {
-      id: id(),
-      name: "Sin redes sociales sin propósito",
-      description: "Cada vez que abro el feed por aburrimiento, reinicio.",
-      type: "quit",
-      startDate: todayISO(),
-      bestStreak: 0,
-      totalRelapses: 0,
-      createdAt: now,
-    },
-  ]
+  return []
 }
 
 export function defaultReminders(): Reminder[] {
-  const now = Date.now()
-  const base = [
-    {
-      id: id(),
-      title: "Vaso de agua",
-      body: "Hidrátate. El cuerpo lo agradece.",
-      time: "10:00",
-      repeat: "daily" as const,
-      enabled: true,
-      createdAt: now,
-    },
-    {
-      id: id(),
-      title: "Movimiento",
-      body: "Levántate, estira o camina 5 minutos.",
-      time: "15:00",
-      repeat: "weekdays" as const,
-      enabled: true,
-      createdAt: now,
-    },
-    {
-      id: id(),
-      title: "Cierre del día",
-      body: "Marca lo que hiciste hoy. Mañana es otra oportunidad.",
-      time: "21:30",
-      repeat: "daily" as const,
-      enabled: true,
-      createdAt: now,
-    },
-  ]
-  return base.map((r) => ({
-    ...r,
-    nextFireAt: computeNextFireAt(r),
-  }))
+  return []
+}
+
+export function defaultEvents(): Event[] {
+  return []
 }
 
 export function defaultRoutine(): RoutineBlock[] {
-  return [
-    {
-      id: id(),
-      label: "Mañana",
-      startTime: "07:00",
-      endTime: "09:00",
-      activity: "Despertar, agua, ejercicio ligero",
-      emoji: "🌅",
-    },
-    {
-      id: id(),
-      label: "Trabajo profundo",
-      startTime: "09:00",
-      endTime: "12:00",
-      activity: "Lo más importante del día. Sin notificaciones.",
-      emoji: "🎯",
-    },
-    {
-      id: id(),
-      label: "Almuerzo y pausa",
-      startTime: "12:00",
-      endTime: "13:30",
-      activity: "Comer bien, alejarte de la pantalla",
-      emoji: "🥗",
-    },
-    {
-      id: id(),
-      label: "Tarde productiva",
-      startTime: "13:30",
-      endTime: "17:00",
-      activity: "Tareas del proyecto activo o aprender",
-      emoji: "🛠️",
-    },
-    {
-      id: id(),
-      label: "Movimiento",
-      startTime: "17:00",
-      endTime: "18:30",
-      activity: "Caminar, gym, deporte. Saca el cuerpo de la silla.",
-      emoji: "🏃",
-    },
-    {
-      id: id(),
-      label: "Noche tranquila",
-      startTime: "20:00",
-      endTime: "22:30",
-      activity: "Cena, leer, conversar. Sin pantallas la última hora.",
-      emoji: "🌙",
-    },
-  ]
+  return []
 }

@@ -1,4 +1,11 @@
-import type { Habit, Project, Reminder, RoutineBlock, Task } from "./types"
+import type {
+  Event,
+  Habit,
+  Project,
+  Reminder,
+  RoutineBlock,
+  Task,
+} from "./types"
 
 export type Store = {
   hydrated: boolean
@@ -12,4 +19,6 @@ export type Store = {
   setRoutine: React.Dispatch<React.SetStateAction<RoutineBlock[]>>
   reminders: Reminder[]
   setReminders: React.Dispatch<React.SetStateAction<Reminder[]>>
+  events: Event[]
+  setEvents: React.Dispatch<React.SetStateAction<Event[]>>
 }

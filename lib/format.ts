@@ -42,6 +42,35 @@ export function formatLongDate(d = new Date()) {
   return `${SPANISH_DAYS[d.getDay()]}, ${d.getDate()} de ${SPANISH_MONTHS[d.getMonth()]}`
 }
 
+export function formatDayHeading(iso: string) {
+  const [y, m, d] = iso.split("-").map(Number)
+  const date = new Date(y, (m || 1) - 1, d || 1)
+  const today = todayISO()
+  const tomorrow = new Date()
+  tomorrow.setDate(tomorrow.getDate() + 1)
+  const yesterday = new Date()
+  yesterday.setDate(yesterday.getDate() - 1)
+  const isoTomorrow = `${tomorrow.getFullYear()}-${pad(tomorrow.getMonth() + 1)}-${pad(tomorrow.getDate())}`
+  const isoYesterday = `${yesterday.getFullYear()}-${pad(yesterday.getMonth() + 1)}-${pad(yesterday.getDate())}`
+  if (iso === today) return `Hoy · ${SPANISH_DAYS[date.getDay()]} ${date.getDate()} de ${SPANISH_MONTHS[date.getMonth()]}`
+  if (iso === isoTomorrow)
+    return `Mañana · ${SPANISH_DAYS[date.getDay()]} ${date.getDate()} de ${SPANISH_MONTHS[date.getMonth()]}`
+  if (iso === isoYesterday)
+    return `Ayer · ${SPANISH_DAYS[date.getDay()]} ${date.getDate()} de ${SPANISH_MONTHS[date.getMonth()]}`
+  return `${SPANISH_DAYS[date.getDay()]} ${date.getDate()} de ${SPANISH_MONTHS[date.getMonth()]}`
+}
+
+function pad(n: number) {
+  return String(n).padStart(2, "0")
+}
+
+export function shiftISO(iso: string, days: number) {
+  const [y, m, d] = iso.split("-").map(Number)
+  const date = new Date(y, (m || 1) - 1, d || 1)
+  date.setDate(date.getDate() + days)
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+}
+
 export function formatTime(time: string) {
   return time
 }

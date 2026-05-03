@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dialog"
 import { CrisisDialog } from "@/components/dialogs/crisis-dialog"
 import { HabitDialog } from "@/components/dialogs/habit-dialog"
+import { EmptyState } from "@/components/empty-state"
 import type { Habit } from "@/lib/types"
 import type { Store } from "@/lib/store-types"
 import { daysSince, todayISO } from "@/lib/format"
@@ -113,15 +114,24 @@ export function HabitsView({ store }: { store: Store }) {
       </div>
 
       {store.habits.length === 0 ? (
-        <Card>
-          <CardContent>
-            <p className="text-muted-foreground py-10 text-center text-sm">
-              No tienes hábitos aún. Crea el primero — el más importante.
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={Flame}
+          title="Sin hábitos todavía"
+          description="Empieza por el que más te cuesta. Lo que sueltes hoy es lo que mañana ya no te roba."
+          action={
+            <Button
+              onClick={() => {
+                setEditing(null)
+                setOpen(true)
+              }}
+            >
+              <Plus />
+              Crear el primero
+            </Button>
+          }
+        />
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="animate-stagger grid gap-4 md:grid-cols-2">
           {store.habits.map((h) => {
             const days = daysSince(h.startDate)
             const next = nextMilestone(days)
@@ -129,7 +139,11 @@ export function HabitsView({ store }: { store: Store }) {
             const span = Math.max(1, next - prev)
             const pct = ((days - prev) / span) * 100
             return (
-              <Card key={h.id} size="default">
+              <Card
+                key={h.id}
+                size="default"
+                className="lift-on-hover hover:shadow-[0_2px_4px_rgb(0_0_0/0.04),0_16px_36px_-12px_rgb(0_0_0/0.12)]"
+              >
                 <CardHeader>
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">

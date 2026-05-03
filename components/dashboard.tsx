@@ -73,8 +73,16 @@ export function Dashboard() {
       habits: store.habits,
       routine: store.routine,
       reminders: store.reminders,
+      events: store.events,
     }),
-    [store.tasks, store.projects, store.habits, store.routine, store.reminders],
+    [
+      store.tasks,
+      store.projects,
+      store.habits,
+      store.routine,
+      store.reminders,
+      store.events,
+    ],
   )
   const sync = useSpaceSync({ code, hydrated: store.hydrated, snapshot })
 
@@ -131,13 +139,13 @@ export function Dashboard() {
                   setMobileOpen(false)
                 }}
                 className={cn(
-                  "group flex w-full items-center gap-3 rounded-2xl px-3 py-2 text-left text-sm transition-colors",
+                  "group flex w-full cursor-pointer items-center gap-3 rounded-2xl px-3 py-2 text-left text-sm transition-all duration-200 ease-out hover:translate-x-0.5 active:scale-[0.98]",
                   active
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
                     : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
                 )}
               >
-                <Icon className="size-4 shrink-0" />
+                <Icon className="size-4 shrink-0 transition-transform group-hover:scale-110" />
                 <span className="font-medium">{item.label}</span>
               </button>
             )
@@ -196,19 +204,25 @@ export function Dashboard() {
 
         <div className="flex-1 px-4 py-6 md:px-8 md:py-8">
           {!store.hydrated ? (
-            <div className="text-muted-foreground text-sm">Cargando…</div>
-          ) : view === "overview" ? (
-            <OverviewView store={store} onNavigate={setView} />
-          ) : view === "today" ? (
-            <TodayView store={store} />
-          ) : view === "tasks" ? (
-            <TasksView store={store} />
-          ) : view === "projects" ? (
-            <ProjectsView store={store} />
-          ) : view === "habits" ? (
-            <HabitsView store={store} />
+            <div className="text-muted-foreground animate-fade-in text-sm">
+              Cargando…
+            </div>
           ) : (
-            <RemindersView store={store} />
+            <div key={view} className="animate-fade-in">
+              {view === "overview" ? (
+                <OverviewView store={store} onNavigate={setView} />
+              ) : view === "today" ? (
+                <TodayView store={store} />
+              ) : view === "tasks" ? (
+                <TasksView store={store} />
+              ) : view === "projects" ? (
+                <ProjectsView store={store} />
+              ) : view === "habits" ? (
+                <HabitsView store={store} />
+              ) : (
+                <RemindersView store={store} />
+              )}
+            </div>
           )}
         </div>
       </main>

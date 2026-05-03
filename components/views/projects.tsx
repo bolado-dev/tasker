@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Pencil, Plus } from "lucide-react"
+import { FolderKanban, Pencil, Plus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -21,6 +21,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import { ProjectDialog } from "@/components/dialogs/project-dialog"
+import { EmptyState } from "@/components/empty-state"
 import { colorClass, type Project, type ProjectStatus } from "@/lib/types"
 import type { Store } from "@/lib/store-types"
 
@@ -84,21 +85,39 @@ export function ProjectsView({ store }: { store: Store }) {
       </div>
 
       {visible.length === 0 ? (
-        <Card>
-          <CardContent>
-            <p className="text-muted-foreground py-10 text-center text-sm">
-              No hay proyectos aquí. Crea uno para empezar.
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={FolderKanban}
+          title={store.projects.length === 0 ? "Sin proyectos todavía" : "Nada aquí"}
+          description={
+            store.projects.length === 0
+              ? "Define en qué quieres invertir tu tiempo. Salud, aprender, vida personal — empieza con uno."
+              : "No hay proyectos en este estado."
+          }
+          action={
+            store.projects.length === 0 ? (
+              <Button
+                onClick={() => {
+                  setEditing(null)
+                  setOpen(true)
+                }}
+              >
+                <Plus />
+                Crear proyecto
+              </Button>
+            ) : undefined
+          }
+        />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="animate-stagger grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {visible.map((p) => {
             const tasks = store.tasks.filter((t) => t.projectId === p.id)
             const done = tasks.filter((t) => t.done).length
             const pct = tasks.length === 0 ? 0 : (done / tasks.length) * 100
             return (
-              <Card key={p.id}>
+              <Card
+                key={p.id}
+                className="lift-on-hover hover:shadow-[0_2px_4px_rgb(0_0_0/0.04),0_16px_36px_-12px_rgb(0_0_0/0.12)]"
+              >
                 <CardHeader>
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-2">

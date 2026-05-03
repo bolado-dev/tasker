@@ -1,7 +1,14 @@
 "use client"
 
 import * as React from "react"
-import type { Habit, Project, Reminder, RoutineBlock, Task } from "./types"
+import type {
+  Event,
+  Habit,
+  Project,
+  Reminder,
+  RoutineBlock,
+  Task,
+} from "./types"
 import { replaceSnapshot } from "./storage"
 
 const SPACE_KEY = "tasker.space.v1"
@@ -19,6 +26,7 @@ type Snapshot = {
   habits: Habit[]
   routine: RoutineBlock[]
   reminders: Reminder[]
+  events: Event[]
 }
 
 const ALPHABET = "abcdefghjkmnpqrstuvwxyz23456789"

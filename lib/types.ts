@@ -1,5 +1,13 @@
 export type Priority = "low" | "med" | "high"
 
+export type Repeat = "none" | "daily" | "weekly"
+
+export type TaskInstanceOverride = {
+  done?: boolean
+  skipped?: boolean
+  completedAt?: number
+}
+
 export type Task = {
   id: string
   title: string
@@ -8,8 +16,17 @@ export type Task = {
   priority: Priority
   projectId?: string
   dueDate?: string
+  startTime?: string
+  endTime?: string
+  repeat?: Repeat
+  repeatUntil?: string
+  instances?: Record<string, TaskInstanceOverride>
   createdAt: number
   completedAt?: number
+}
+
+export function isTimedTask(t: { startTime?: string; endTime?: string }) {
+  return Boolean(t.startTime && t.endTime)
 }
 
 export type ProjectStatus = "active" | "paused" | "done"
@@ -43,6 +60,29 @@ export type RoutineBlock = {
   endTime: string
   activity: string
   emoji?: string
+}
+
+export type EventInstanceOverride = {
+  skipped?: boolean
+  startTime?: string
+  endTime?: string
+  title?: string
+  notes?: string
+}
+
+export type Event = {
+  id: string
+  title: string
+  notes?: string
+  date: string
+  startTime: string
+  endTime: string
+  projectId?: string
+  color?: string
+  repeat?: Repeat
+  repeatUntil?: string
+  instances?: Record<string, EventInstanceOverride>
+  createdAt: number
 }
 
 export type View =

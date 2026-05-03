@@ -23,6 +23,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { ReminderDialog } from "@/components/dialogs/reminder-dialog"
+import { EmptyState } from "@/components/empty-state"
 import type { Reminder } from "@/lib/types"
 import type { Store } from "@/lib/store-types"
 import {
@@ -205,17 +206,30 @@ export function RemindersView({ store }: { store: Store }) {
       </div>
 
       {sorted.length === 0 ? (
-        <Card>
-          <CardContent>
-            <p className="text-muted-foreground py-10 text-center text-sm">
-              No tienes recordatorios. Crea uno para que algo te saque del piloto automático.
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={Bell}
+          title="Sin recordatorios"
+          description="Crea uno para que algo te saque del piloto automático y te lleve donde quieres ir."
+          action={
+            <Button
+              onClick={() => {
+                setEditing(null)
+                setOpen(true)
+              }}
+            >
+              <Plus />
+              Crear recordatorio
+            </Button>
+          }
+        />
       ) : (
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="animate-stagger grid gap-3 md:grid-cols-2">
           {sorted.map((r) => (
-            <Card key={r.id} size="sm">
+            <Card
+              key={r.id}
+              size="sm"
+              className="lift-on-hover hover:shadow-[0_2px_4px_rgb(0_0_0/0.04),0_16px_36px_-12px_rgb(0_0_0/0.10)]"
+            >
               <CardContent>
                 <div className="flex items-start gap-3">
                   <div
