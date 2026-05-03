@@ -98,7 +98,7 @@ export function TodayView({ store }: { store: Store }) {
               </p>
             ) : (
               <ol className="relative space-y-3 pl-6">
-                <span className="bg-border absolute top-2 bottom-2 left-2 w-px" />
+                <span className="bg-foreground/10 absolute top-2 bottom-2 left-2 w-px" />
                 {sortedRoutine.map((b) => {
                   const start = timeToMinutes(b.startTime)
                   const end = timeToMinutes(b.endTime)
@@ -116,8 +116,8 @@ export function TodayView({ store }: { store: Store }) {
                         }`}
                       />
                       <div
-                        className={`rounded-2xl border p-3 transition-colors ${
-                          isNow ? "border-primary/30 bg-primary/5" : "border-border"
+                        className={`rounded-2xl p-3 transition-colors ${
+                          isNow ? "bg-accent" : "bg-muted/50"
                         }`}
                       >
                         <div className="flex items-start gap-3">
@@ -177,7 +177,7 @@ export function TodayView({ store }: { store: Store }) {
                 Sin tareas para hoy. Agrega una arriba.
               </p>
             ) : (
-              <ul className="divide-border divide-y">
+              <ul className="divide-foreground/5 divide-y">
                 {tasksToday.map((t) => {
                   const project = store.projects.find((p) => p.id === t.projectId)
                   return (

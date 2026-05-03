@@ -1,4 +1,5 @@
-import type { Habit, Project, RoutineBlock, Task } from "./types"
+import type { Habit, Project, Reminder, RoutineBlock, Task } from "./types"
+import { computeNextFireAt } from "./reminder"
 
 function todayISO() {
   const d = new Date()
@@ -100,6 +101,43 @@ export function defaultHabits(): Habit[] {
       createdAt: now,
     },
   ]
+}
+
+export function defaultReminders(): Reminder[] {
+  const now = Date.now()
+  const base = [
+    {
+      id: id(),
+      title: "Vaso de agua",
+      body: "Hidrátate. El cuerpo lo agradece.",
+      time: "10:00",
+      repeat: "daily" as const,
+      enabled: true,
+      createdAt: now,
+    },
+    {
+      id: id(),
+      title: "Movimiento",
+      body: "Levántate, estira o camina 5 minutos.",
+      time: "15:00",
+      repeat: "weekdays" as const,
+      enabled: true,
+      createdAt: now,
+    },
+    {
+      id: id(),
+      title: "Cierre del día",
+      body: "Marca lo que hiciste hoy. Mañana es otra oportunidad.",
+      time: "21:30",
+      repeat: "daily" as const,
+      enabled: true,
+      createdAt: now,
+    },
+  ]
+  return base.map((r) => ({
+    ...r,
+    nextFireAt: computeNextFireAt(r),
+  }))
 }
 
 export function defaultRoutine(): RoutineBlock[] {

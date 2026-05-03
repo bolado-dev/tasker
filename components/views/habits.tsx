@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Flame, Pencil, Plus, RotateCcw, Sparkles, TrendingUp } from "lucide-react"
+import { Flame, Pencil, Plus, Quote, RotateCcw, TrendingUp } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -77,11 +77,11 @@ export function HabitsView({ store }: { store: Store }) {
 
   return (
     <div className="space-y-6">
-      <Card className="from-orange-500/10 to-rose-500/5 ring-orange-500/20 bg-gradient-to-br">
+      <Card className="bg-accent/60">
         <CardHeader>
           <div className="flex items-start gap-3">
-            <div className="bg-orange-500/15 text-orange-500 flex size-10 items-center justify-center rounded-2xl">
-              <Sparkles className="size-5" />
+            <div className="bg-card text-muted-foreground flex size-10 items-center justify-center rounded-2xl">
+              <Quote className="size-4" />
             </div>
             <div className="min-w-0 flex-1">
               <CardTitle>Cada día limpio se cuenta dos veces.</CardTitle>
@@ -136,11 +136,7 @@ export function HabitsView({ store }: { store: Store }) {
                       <div className="flex items-center gap-2">
                         <Badge
                           variant="outline"
-                          className={
-                            h.type === "quit"
-                              ? "border-orange-500/30 text-orange-500"
-                              : "border-emerald-500/30 text-emerald-500"
-                          }
+                          className="bg-muted text-muted-foreground border-transparent"
                         >
                           {h.type === "quit" ? "Dejar" : "Construir"}
                         </Badge>
@@ -168,7 +164,7 @@ export function HabitsView({ store }: { store: Store }) {
                 <CardContent>
                   <div className="bg-muted flex items-center gap-4 rounded-2xl p-4">
                     <div className="bg-background flex size-14 shrink-0 items-center justify-center rounded-2xl shadow-sm">
-                      <Flame className="size-6 text-orange-500" />
+                      <Flame className="text-muted-foreground size-6" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline gap-1.5">

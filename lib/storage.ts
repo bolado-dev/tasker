@@ -1,14 +1,21 @@
 "use client"
 
 import * as React from "react"
-import type { Habit, Project, RoutineBlock, Task } from "./types"
-import { defaultHabits, defaultProjects, defaultRoutine, defaultTasks } from "./seed"
+import type { Habit, Project, Reminder, RoutineBlock, Task } from "./types"
+import {
+  defaultHabits,
+  defaultProjects,
+  defaultReminders,
+  defaultRoutine,
+  defaultTasks,
+} from "./seed"
 
 const KEYS = {
   tasks: "tasker.tasks.v1",
   projects: "tasker.projects.v1",
   habits: "tasker.habits.v1",
   routine: "tasker.routine.v1",
+  reminders: "tasker.reminders.v1",
   seeded: "tasker.seeded.v1",
 } as const
 
@@ -41,6 +48,8 @@ function ensureSeeded() {
       write(KEYS.projects, defaultProjects())
     if (!window.localStorage.getItem(KEYS.habits)) write(KEYS.habits, defaultHabits())
     if (!window.localStorage.getItem(KEYS.routine)) write(KEYS.routine, defaultRoutine())
+    if (!window.localStorage.getItem(KEYS.reminders))
+      write(KEYS.reminders, defaultReminders())
     window.localStorage.setItem(KEYS.seeded, "1")
   }
   seeded = true
@@ -98,17 +107,20 @@ export function replaceSnapshot(snap: {
   projects: Project[]
   habits: Habit[]
   routine: RoutineBlock[]
+  reminders?: Reminder[]
 }) {
   setStored(KEYS.tasks, snap.tasks, EMPTY_TASKS_REF)
   setStored(KEYS.projects, snap.projects, EMPTY_PROJECTS_REF)
   setStored(KEYS.habits, snap.habits, EMPTY_HABITS_REF)
   setStored(KEYS.routine, snap.routine, EMPTY_ROUTINE_REF)
+  setStored(KEYS.reminders, snap.reminders ?? [], EMPTY_REMINDERS_REF)
 }
 
 const EMPTY_TASKS_REF: Task[] = []
 const EMPTY_PROJECTS_REF: Project[] = []
 const EMPTY_HABITS_REF: Habit[] = []
 const EMPTY_ROUTINE_REF: RoutineBlock[] = []
+const EMPTY_REMINDERS_REF: Reminder[] = []
 
 export function uid() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -121,6 +133,7 @@ const EMPTY_TASKS: Task[] = []
 const EMPTY_PROJECTS: Project[] = []
 const EMPTY_HABITS: Habit[] = []
 const EMPTY_ROUTINE: RoutineBlock[] = []
+const EMPTY_REMINDERS: Reminder[] = []
 
 const noopSubscribe = () => () => {}
 
@@ -137,6 +150,10 @@ export function useTasker() {
   const [projects, setProjects] = useStored<Project[]>(KEYS.projects, EMPTY_PROJECTS)
   const [habits, setHabits] = useStored<Habit[]>(KEYS.habits, EMPTY_HABITS)
   const [routine, setRoutine] = useStored<RoutineBlock[]>(KEYS.routine, EMPTY_ROUTINE)
+  const [reminders, setReminders] = useStored<Reminder[]>(
+    KEYS.reminders,
+    EMPTY_REMINDERS,
+  )
 
   const hydrated = useIsClient()
 
@@ -150,6 +167,8 @@ export function useTasker() {
     setHabits,
     routine,
     setRoutine,
+    reminders,
+    setReminders,
   }
 }
 

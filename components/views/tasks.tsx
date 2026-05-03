@@ -146,7 +146,7 @@ export function TasksView({ store }: { store: Store }) {
               No hay tareas con estos filtros.
             </p>
           ) : (
-            <ul className="divide-border divide-y">
+            <ul className="divide-foreground/5 divide-y">
               {filtered.map((t) => {
                 const proj = store.projects.find((p) => p.id === t.projectId)
                 const overdue =
@@ -200,9 +200,9 @@ export function TasksView({ store }: { store: Store }) {
                           <span
                             className={
                               overdue
-                                ? "text-rose-500"
+                                ? "text-destructive/80"
                                 : isToday(t.dueDate)
-                                  ? "text-primary"
+                                  ? "text-foreground font-medium"
                                   : "text-muted-foreground"
                             }
                           >

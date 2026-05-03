@@ -56,9 +56,17 @@ export function priorityLabel(p: "low" | "med" | "high") {
 }
 
 export function priorityClasses(p: "low" | "med" | "high") {
-  if (p === "high") return "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
-  if (p === "med") return "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
-  return "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20"
+  if (p === "high")
+    return "bg-foreground/10 text-foreground border-transparent font-medium"
+  if (p === "med")
+    return "bg-muted text-muted-foreground border-transparent"
+  return "bg-transparent text-muted-foreground border-transparent"
+}
+
+export function priorityDot(p: "low" | "med" | "high") {
+  if (p === "high") return "bg-foreground/70"
+  if (p === "med") return "bg-foreground/40"
+  return "bg-foreground/20"
 }
 
 export function streakWord(days: number) {

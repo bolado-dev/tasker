@@ -3,6 +3,7 @@
 import * as React from "react"
 import {
   Activity,
+  Bell,
   CalendarDays,
   CircleAlert,
   CircleCheck,
@@ -38,6 +39,7 @@ import { TodayView } from "@/components/views/today"
 import { TasksView } from "@/components/views/tasks"
 import { ProjectsView } from "@/components/views/projects"
 import { HabitsView } from "@/components/views/habits"
+import { RemindersView } from "@/components/views/reminders"
 import { SpaceDialog } from "@/components/dialogs/space-dialog"
 import { InstallButton } from "@/components/install-button"
 
@@ -54,6 +56,7 @@ const NAV: NavItem[] = [
   { id: "tasks", label: "Tareas", icon: ListTodo, hint: "Todo lo que tienes que hacer" },
   { id: "projects", label: "Proyectos", icon: FolderKanban, hint: "En qué inviertes tu tiempo" },
   { id: "habits", label: "Hábitos", icon: Flame, hint: "Rachas para dejar adicciones" },
+  { id: "reminders", label: "Recordatorios", icon: Bell, hint: "Notificaciones a la hora" },
 ]
 
 export function Dashboard() {
@@ -69,8 +72,9 @@ export function Dashboard() {
       projects: store.projects,
       habits: store.habits,
       routine: store.routine,
+      reminders: store.reminders,
     }),
-    [store.tasks, store.projects, store.habits, store.routine],
+    [store.tasks, store.projects, store.habits, store.routine, store.reminders],
   )
   const sync = useSpaceSync({ code, hydrated: store.hydrated, snapshot })
 
@@ -169,7 +173,7 @@ export function Dashboard() {
       )}
 
       <main className="flex min-w-0 flex-1 flex-col">
-        <header className="bg-background/80 sticky top-0 z-20 flex items-center gap-3 border-b px-4 py-3 backdrop-blur md:px-8">
+        <header className="bg-background/80 sticky top-0 z-20 flex items-center gap-3 px-4 py-3 backdrop-blur md:px-8">
           <Button
             variant="ghost"
             size="icon-sm"
@@ -201,8 +205,10 @@ export function Dashboard() {
             <TasksView store={store} />
           ) : view === "projects" ? (
             <ProjectsView store={store} />
-          ) : (
+          ) : view === "habits" ? (
             <HabitsView store={store} />
+          ) : (
+            <RemindersView store={store} />
           )}
         </div>
       </main>
@@ -240,11 +246,11 @@ function SyncBadge({
     label = "Guardando en la nube…"
   } else if (status.kind === "error") {
     icon = <CircleAlert className="size-4" />
-    tone = "text-destructive"
+    tone = "text-destructive/80"
     label = `Error: ${status.message}`
   } else if (status.kind === "idle") {
     icon = <CircleCheck className="size-4" />
-    tone = "text-emerald-500"
+    tone = "text-foreground/70"
     label = "Sincronizado"
   } else {
     icon = <Cloud className="size-4" />

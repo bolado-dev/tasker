@@ -31,9 +31,9 @@ const STATUS_LABEL: Record<ProjectStatus, string> = {
 }
 
 const STATUS_BADGE: Record<ProjectStatus, string> = {
-  active: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-  paused: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
-  done: "bg-muted text-muted-foreground border-transparent",
+  active: "bg-foreground/10 text-foreground border-transparent font-medium",
+  paused: "bg-muted text-muted-foreground border-transparent",
+  done: "bg-transparent text-muted-foreground/60 border-transparent",
 }
 
 export function ProjectsView({ store }: { store: Store }) {

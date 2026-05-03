@@ -8,7 +8,7 @@ import {
   FolderKanban,
   Heart,
   ListChecks,
-  Sparkles,
+  Quote,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Separator } from "@/components/ui/separator"
 import { Checkbox } from "@/components/ui/checkbox"
 import { CrisisDialog } from "@/components/dialogs/crisis-dialog"
 import { colorClass, type View } from "@/lib/types"
@@ -72,11 +71,11 @@ export function OverviewView({
 
   return (
     <div className="space-y-6">
-      <Card className="from-primary/15 to-primary/5 ring-primary/20 bg-gradient-to-br">
+      <Card className="bg-accent/60">
         <CardHeader>
           <div className="flex items-start gap-3">
-            <div className="bg-primary/20 text-primary flex size-10 items-center justify-center rounded-2xl">
-              <Sparkles className="size-5" />
+            <div className="bg-card text-muted-foreground flex size-10 items-center justify-center rounded-2xl">
+              <Quote className="size-4" />
             </div>
             <div className="min-w-0 flex-1">
               <CardTitle className="text-base">Hoy es un buen día para seguir.</CardTitle>
@@ -93,28 +92,24 @@ export function OverviewView({
           label="Racha más larga"
           value={`${longestStreak}`}
           unit="días"
-          tone="emerald"
         />
         <StatCard
           icon={<Heart className="size-4" />}
           label="Total días ganados"
           value={`${totalDaysClean}`}
           unit="días"
-          tone="rose"
         />
         <StatCard
           icon={<ListChecks className="size-4" />}
           label="Tareas hoy"
           value={`${doneToday}`}
           unit={`/ ${tasksToday.length}`}
-          tone="sky"
         />
         <StatCard
           icon={<FolderKanban className="size-4" />}
           label="Proyectos activos"
           value={`${activeProjects.length}`}
           unit=""
-          tone="violet"
         />
       </div>
 
@@ -149,7 +144,7 @@ export function OverviewView({
                 }
               />
             ) : (
-              <ul className="divide-border divide-y">
+              <ul className="divide-foreground/5 divide-y">
                 {tasksToday.slice(0, 6).map((t) => {
                   const project = store.projects.find((p) => p.id === t.projectId)
                   return (
@@ -220,9 +215,9 @@ export function OverviewView({
                     <button
                       key={h.id}
                       onClick={() => onNavigate("habits")}
-                      className="hover:bg-muted/60 -mx-2 flex w-[calc(100%+1rem)] items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors"
+                      className="hover:bg-muted -mx-2 flex w-[calc(100%+1rem)] items-center gap-3 rounded-2xl px-2 py-2 text-left transition-colors"
                     >
-                      <div className="bg-orange-500/10 text-orange-500 flex size-10 items-center justify-center rounded-2xl">
+                      <div className="bg-muted text-muted-foreground flex size-10 items-center justify-center rounded-2xl">
                         <Flame className="size-4" />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -280,7 +275,7 @@ export function OverviewView({
                   <button
                     key={p.id}
                     onClick={() => onNavigate("projects")}
-                    className="hover:bg-muted/60 group/proj rounded-2xl border p-4 text-left transition-colors"
+                    className="bg-muted/50 hover:bg-muted group/proj rounded-2xl p-4 text-left transition-colors"
                   >
                     <div className="flex items-center gap-2">
                       <span className={`size-2.5 rounded-full ${colorClass(p.color)}`} />
@@ -291,9 +286,8 @@ export function OverviewView({
                         {p.description}
                       </p>
                     )}
-                    <Separator className="my-3" />
-                    <div className="flex items-center gap-2">
-                      <Progress value={pct} className="h-1.5 flex-1" />
+                    <div className="mt-4 flex items-center gap-2">
+                      <Progress value={pct} className="h-1 flex-1" />
                       <span className="text-muted-foreground text-xs tabular-nums">
                         {completed}/{projTasks.length}
                       </span>
@@ -314,27 +308,17 @@ function StatCard({
   label,
   value,
   unit,
-  tone,
 }: {
   icon: React.ReactNode
   label: string
   value: string
   unit: string
-  tone: "emerald" | "rose" | "sky" | "violet"
 }) {
-  const toneMap = {
-    emerald: "bg-emerald-500/10 text-emerald-500",
-    rose: "bg-rose-500/10 text-rose-500",
-    sky: "bg-sky-500/10 text-sky-500",
-    violet: "bg-violet-500/10 text-violet-500",
-  } as const
   return (
     <Card size="sm">
       <CardContent>
         <div className="flex items-start gap-3">
-          <div
-            className={`flex size-9 shrink-0 items-center justify-center rounded-2xl ${toneMap[tone]}`}
-          >
+          <div className="bg-muted text-muted-foreground flex size-9 shrink-0 items-center justify-center rounded-2xl">
             {icon}
           </div>
           <div className="min-w-0">

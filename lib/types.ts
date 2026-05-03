@@ -45,19 +45,42 @@ export type RoutineBlock = {
   emoji?: string
 }
 
-export type View = "overview" | "today" | "tasks" | "projects" | "habits"
+export type View =
+  | "overview"
+  | "today"
+  | "tasks"
+  | "projects"
+  | "habits"
+  | "reminders"
+
+export type ReminderRepeat = "once" | "daily" | "weekdays" | "weekly"
+
+export type Reminder = {
+  id: string
+  title: string
+  body?: string
+  time: string
+  date?: string
+  weekday?: number
+  repeat: ReminderRepeat
+  enabled: boolean
+  lastFiredAt?: number
+  nextFireAt: number
+  createdAt: number
+}
 
 export const PROJECT_COLORS = [
-  { name: "emerald", className: "bg-emerald-500" },
-  { name: "sky", className: "bg-sky-500" },
-  { name: "violet", className: "bg-violet-500" },
-  { name: "amber", className: "bg-amber-500" },
-  { name: "rose", className: "bg-rose-500" },
-  { name: "fuchsia", className: "bg-fuchsia-500" },
-  { name: "teal", className: "bg-teal-500" },
-  { name: "orange", className: "bg-orange-500" },
+  { name: "lavender", className: "bg-violet-300/70 dark:bg-violet-400/40" },
+  { name: "blush", className: "bg-pink-300/60 dark:bg-pink-400/30" },
+  { name: "mint", className: "bg-emerald-300/60 dark:bg-emerald-400/30" },
+  { name: "peach", className: "bg-orange-200/80 dark:bg-orange-300/30" },
+  { name: "sky", className: "bg-sky-300/60 dark:bg-sky-400/30" },
+  { name: "sand", className: "bg-amber-200/70 dark:bg-amber-300/25" },
 ] as const
 
 export function colorClass(name: string) {
-  return PROJECT_COLORS.find((c) => c.name === name)?.className ?? "bg-emerald-500"
+  return (
+    PROJECT_COLORS.find((c) => c.name === name)?.className ??
+    "bg-violet-300/70 dark:bg-violet-400/40"
+  )
 }

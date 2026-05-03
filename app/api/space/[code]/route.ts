@@ -12,6 +12,7 @@ type Snapshot = {
   projects?: unknown
   habits?: unknown
   routine?: unknown
+  reminders?: unknown
   updatedAt?: number
 }
 
@@ -59,6 +60,7 @@ export async function PUT(
     projects: Array.isArray(body.projects) ? body.projects : [],
     habits: Array.isArray(body.habits) ? body.habits : [],
     routine: Array.isArray(body.routine) ? body.routine : [],
+    reminders: Array.isArray(body.reminders) ? body.reminders : [],
     updatedAt: Date.now(),
   }
 
