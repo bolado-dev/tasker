@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     userAgent: body.userAgent,
     createdAt: Date.now(),
   }
-
+ 
   await saveSubscription(stored)
   return NextResponse.json({ ok: true, id })
 }
