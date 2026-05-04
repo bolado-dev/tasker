@@ -12,8 +12,11 @@ type Snapshot = {
   projects?: unknown
   habits?: unknown
   routine?: unknown
-  reminders?: unknown
   events?: unknown
+  recipes?: unknown
+  sleep?: unknown
+  weight?: unknown
+  healthGoal?: unknown
   updatedAt?: number
 }
 
@@ -61,8 +64,12 @@ export async function PUT(
     projects: Array.isArray(body.projects) ? body.projects : [],
     habits: Array.isArray(body.habits) ? body.habits : [],
     routine: Array.isArray(body.routine) ? body.routine : [],
-    reminders: Array.isArray(body.reminders) ? body.reminders : [],
     events: Array.isArray(body.events) ? body.events : [],
+    recipes: Array.isArray(body.recipes) ? body.recipes : [],
+    sleep: Array.isArray(body.sleep) ? body.sleep : [],
+    weight: Array.isArray(body.weight) ? body.weight : [],
+    healthGoal:
+      body.healthGoal && typeof body.healthGoal === "object" ? body.healthGoal : {},
     updatedAt: Date.now(),
   }
 

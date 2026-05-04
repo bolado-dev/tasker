@@ -1,10 +1,13 @@
 import type {
   Event,
   Habit,
+  HealthGoal,
   Project,
-  Reminder,
+  Recipe,
   RoutineBlock,
+  SleepEntry,
   Task,
+  WeightEntry,
 } from "./types"
 
 export function defaultProjects(): Project[] {
@@ -19,14 +22,26 @@ export function defaultHabits(): Habit[] {
   return []
 }
 
-export function defaultReminders(): Reminder[] {
-  return []
-}
-
 export function defaultEvents(): Event[] {
   return []
 }
 
 export function defaultRoutine(): RoutineBlock[] {
   return []
+}
+
+export function defaultRecipes(): Recipe[] {
+  return []
+}
+
+export function defaultSleep(): SleepEntry[] {
+  return []
+}
+
+export function defaultWeight(): WeightEntry[] {
+  return []
+}
+
+export function defaultHealthGoal(): HealthGoal {
+  return {}
 }

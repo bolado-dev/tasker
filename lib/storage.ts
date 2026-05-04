@@ -4,18 +4,24 @@ import * as React from "react"
 import type {
   Event,
   Habit,
+  HealthGoal,
   Project,
-  Reminder,
+  Recipe,
   RoutineBlock,
+  SleepEntry,
   Task,
+  WeightEntry,
 } from "./types"
 import {
   defaultEvents,
   defaultHabits,
   defaultProjects,
-  defaultReminders,
   defaultRoutine,
   defaultTasks,
+  defaultRecipes,
+  defaultSleep,
+  defaultWeight,
+  defaultHealthGoal,
 } from "./seed"
 
 const KEYS = {
@@ -23,9 +29,12 @@ const KEYS = {
   projects: "tasker.projects.v1",
   habits: "tasker.habits.v1",
   routine: "tasker.routine.v1",
-  reminders: "tasker.reminders.v1",
   events: "tasker.events.v1",
-  seeded: "tasker.seeded.v1",
+  recipes: "tasker.recipes.v1",
+  sleep: "tasker.sleep.v1",
+  weight: "tasker.weight.v1",
+  healthGoal: "tasker.healthGoal.v1",
+  seeded: "tasker.seeded.v2",
 } as const
 
 function read<T>(key: string, fallback: T): T {
@@ -57,10 +66,14 @@ function ensureSeeded() {
       write(KEYS.projects, defaultProjects())
     if (!window.localStorage.getItem(KEYS.habits)) write(KEYS.habits, defaultHabits())
     if (!window.localStorage.getItem(KEYS.routine)) write(KEYS.routine, defaultRoutine())
-    if (!window.localStorage.getItem(KEYS.reminders))
-      write(KEYS.reminders, defaultReminders())
     if (!window.localStorage.getItem(KEYS.events))
       write(KEYS.events, defaultEvents())
+    if (!window.localStorage.getItem(KEYS.recipes))
+      write(KEYS.recipes, defaultRecipes())
+    if (!window.localStorage.getItem(KEYS.sleep)) write(KEYS.sleep, defaultSleep())
+    if (!window.localStorage.getItem(KEYS.weight)) write(KEYS.weight, defaultWeight())
+    if (!window.localStorage.getItem(KEYS.healthGoal))
+      write(KEYS.healthGoal, defaultHealthGoal())
     window.localStorage.setItem(KEYS.seeded, "1")
   }
   seeded = true
@@ -118,23 +131,32 @@ export function replaceSnapshot(snap: {
   projects: Project[]
   habits: Habit[]
   routine: RoutineBlock[]
-  reminders?: Reminder[]
   events?: Event[]
+  recipes?: Recipe[]
+  sleep?: SleepEntry[]
+  weight?: WeightEntry[]
+  healthGoal?: HealthGoal
 }) {
   setStored(KEYS.tasks, snap.tasks, EMPTY_TASKS_REF)
   setStored(KEYS.projects, snap.projects, EMPTY_PROJECTS_REF)
   setStored(KEYS.habits, snap.habits, EMPTY_HABITS_REF)
   setStored(KEYS.routine, snap.routine, EMPTY_ROUTINE_REF)
-  setStored(KEYS.reminders, snap.reminders ?? [], EMPTY_REMINDERS_REF)
   setStored(KEYS.events, snap.events ?? [], EMPTY_EVENTS_REF)
+  setStored(KEYS.recipes, snap.recipes ?? [], EMPTY_RECIPES_REF)
+  setStored(KEYS.sleep, snap.sleep ?? [], EMPTY_SLEEP_REF)
+  setStored(KEYS.weight, snap.weight ?? [], EMPTY_WEIGHT_REF)
+  setStored(KEYS.healthGoal, snap.healthGoal ?? {}, EMPTY_GOAL_REF)
 }
 
 const EMPTY_TASKS_REF: Task[] = []
 const EMPTY_PROJECTS_REF: Project[] = []
 const EMPTY_HABITS_REF: Habit[] = []
 const EMPTY_ROUTINE_REF: RoutineBlock[] = []
-const EMPTY_REMINDERS_REF: Reminder[] = []
 const EMPTY_EVENTS_REF: Event[] = []
+const EMPTY_RECIPES_REF: Recipe[] = []
+const EMPTY_SLEEP_REF: SleepEntry[] = []
+const EMPTY_WEIGHT_REF: WeightEntry[] = []
+const EMPTY_GOAL_REF: HealthGoal = {}
 
 export function uid() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -147,8 +169,11 @@ const EMPTY_TASKS: Task[] = []
 const EMPTY_PROJECTS: Project[] = []
 const EMPTY_HABITS: Habit[] = []
 const EMPTY_ROUTINE: RoutineBlock[] = []
-const EMPTY_REMINDERS: Reminder[] = []
 const EMPTY_EVENTS: Event[] = []
+const EMPTY_RECIPES: Recipe[] = []
+const EMPTY_SLEEP: SleepEntry[] = []
+const EMPTY_WEIGHT: WeightEntry[] = []
+const EMPTY_GOAL: HealthGoal = {}
 
 const noopSubscribe = () => () => {}
 
@@ -165,11 +190,14 @@ export function useTasker() {
   const [projects, setProjects] = useStored<Project[]>(KEYS.projects, EMPTY_PROJECTS)
   const [habits, setHabits] = useStored<Habit[]>(KEYS.habits, EMPTY_HABITS)
   const [routine, setRoutine] = useStored<RoutineBlock[]>(KEYS.routine, EMPTY_ROUTINE)
-  const [reminders, setReminders] = useStored<Reminder[]>(
-    KEYS.reminders,
-    EMPTY_REMINDERS,
-  )
   const [events, setEvents] = useStored<Event[]>(KEYS.events, EMPTY_EVENTS)
+  const [recipes, setRecipes] = useStored<Recipe[]>(KEYS.recipes, EMPTY_RECIPES)
+  const [sleep, setSleep] = useStored<SleepEntry[]>(KEYS.sleep, EMPTY_SLEEP)
+  const [weight, setWeight] = useStored<WeightEntry[]>(KEYS.weight, EMPTY_WEIGHT)
+  const [healthGoal, setHealthGoal] = useStored<HealthGoal>(
+    KEYS.healthGoal,
+    EMPTY_GOAL,
+  )
 
   const hydrated = useIsClient()
 
@@ -183,10 +211,16 @@ export function useTasker() {
     setHabits,
     routine,
     setRoutine,
-    reminders,
-    setReminders,
     events,
     setEvents,
+    recipes,
+    setRecipes,
+    sleep,
+    setSleep,
+    weight,
+    setWeight,
+    healthGoal,
+    setHealthGoal,
   }
 }
 

@@ -6,8 +6,8 @@ import {
   CheckCircle2,
   Flame,
   FolderKanban,
-  Heart,
   ListChecks,
+  Moon,
   Quote,
 } from "lucide-react"
 
@@ -20,9 +20,9 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
 import { Checkbox } from "@/components/ui/checkbox"
 import { CrisisDialog } from "@/components/dialogs/crisis-dialog"
+import { RadialChart } from "@/components/radial-chart"
 import { colorClass, type View } from "@/lib/types"
 import type { Store } from "@/lib/store-types"
 import { daysSince, priorityClasses, todayISO } from "@/lib/format"
@@ -40,6 +40,26 @@ const QUOTES = [
   "Tu yo de mañana te está mirando ahora mismo. Hazlo orgulloso.",
 ]
 
+const STREAK_MILESTONES = [1, 7, 14, 30, 60, 90, 180, 365]
+function nextStreakMilestone(days: number) {
+  return STREAK_MILESTONES.find((m) => m > days) ?? days + 30
+}
+
+function lastNDates(n: number) {
+  const out: string[] = []
+  const d = new Date()
+  for (let i = n - 1; i >= 0; i--) {
+    const dd = new Date(d)
+    dd.setDate(dd.getDate() - i)
+    out.push(
+      `${dd.getFullYear()}-${String(dd.getMonth() + 1).padStart(2, "0")}-${String(
+        dd.getDate(),
+      ).padStart(2, "0")}`,
+    )
+  }
+  return out
+}
+
 export function OverviewView({
   store,
   onNavigate,
@@ -53,14 +73,26 @@ export function OverviewView({
     [store.tasks, today],
   )
   const doneToday = tasksToday.filter((t) => t.done).length
-  const progress = tasksToday.length === 0 ? 0 : (doneToday / tasksToday.length) * 100
+  const tasksFraction = tasksToday.length === 0 ? 0 : doneToday / tasksToday.length
 
   const activeProjects = store.projects.filter((p) => p.status === "active")
   const longestStreak = store.habits.reduce(
     (max, h) => Math.max(max, daysSince(h.startDate)),
     0,
   )
-  const totalDaysClean = store.habits.reduce((acc, h) => acc + daysSince(h.startDate), 0)
+  const nextMs = nextStreakMilestone(longestStreak)
+
+  const sleepGoal = store.healthGoal.sleepHours ?? 8
+  const last7 = lastNDates(7)
+  const last7Sleep = store.sleep.filter((s) => last7.includes(s.date))
+  const avgSleep =
+    last7Sleep.length === 0
+      ? 0
+      : last7Sleep.reduce((s, x) => s + x.hours, 0) / last7Sleep.length
+  const sleepFraction = Math.min(1, avgSleep / sleepGoal)
+
+  const projectsTotal = store.projects.length || 1
+  const projectsActiveFrac = activeProjects.length / projectsTotal
 
   const quote = React.useMemo(() => {
     const idx = new Date().getDate() % QUOTES.length
@@ -98,29 +130,41 @@ export function OverviewView({
       </Card>
 
       <div className="animate-stagger grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          icon={<Flame className="size-4" />}
-          label="Racha más larga"
-          value={`${longestStreak}`}
-          unit="días"
-        />
-        <StatCard
-          icon={<Heart className="size-4" />}
-          label="Total días ganados"
-          value={`${totalDaysClean}`}
-          unit="días"
-        />
-        <StatCard
+        <RadialStat
           icon={<ListChecks className="size-4" />}
           label="Tareas hoy"
-          value={`${doneToday}`}
-          unit={`/ ${tasksToday.length}`}
+          value={tasksFraction}
+          big={`${doneToday}`}
+          small={`/ ${tasksToday.length}`}
+          fgClassName="stroke-primary"
+          onClick={() => onNavigate("today")}
         />
-        <StatCard
+        <RadialStat
+          icon={<Flame className="size-4" />}
+          label="Racha más larga"
+          value={Math.min(1, longestStreak / nextMs)}
+          big={`${longestStreak}`}
+          small={`/ ${nextMs} d`}
+          fgClassName="stroke-orange-400"
+          onClick={() => onNavigate("habits")}
+        />
+        <RadialStat
+          icon={<Moon className="size-4" />}
+          label="Sueño 7 días"
+          value={sleepFraction}
+          big={avgSleep > 0 ? avgSleep.toFixed(1) : "—"}
+          small={avgSleep > 0 ? `/ ${sleepGoal} h` : "sin datos"}
+          fgClassName="stroke-violet-400"
+          onClick={() => onNavigate("health")}
+        />
+        <RadialStat
           icon={<FolderKanban className="size-4" />}
           label="Proyectos activos"
-          value={`${activeProjects.length}`}
-          unit=""
+          value={projectsActiveFrac}
+          big={`${activeProjects.length}`}
+          small={`/ ${store.projects.length}`}
+          fgClassName="stroke-emerald-400"
+          onClick={() => onNavigate("projects")}
         />
       </div>
 
@@ -138,14 +182,8 @@ export function OverviewView({
             </div>
           </CardHeader>
           <CardContent>
-            <div className="mb-4 flex items-center gap-3">
-              <Progress value={progress} className="h-2 flex-1" />
-              <span className="text-muted-foreground text-xs tabular-nums">
-                {Math.round(progress)}%
-              </span>
-            </div>
             {tasksToday.length === 0 ? (
-              <EmptyState
+              <SmallEmpty
                 title="No hay tareas para hoy"
                 hint="Agenda algo en Tareas para llenar el día."
                 action={
@@ -212,7 +250,7 @@ export function OverviewView({
           </CardHeader>
           <CardContent>
             {store.habits.length === 0 ? (
-              <EmptyState
+              <SmallEmpty
                 title="Sin hábitos aún"
                 hint="Crea uno en Hábitos para empezar a contar."
                 action={
@@ -225,19 +263,25 @@ export function OverviewView({
               <div className="space-y-3">
                 {store.habits.slice(0, 4).map((h) => {
                   const days = daysSince(h.startDate)
+                  const next = nextStreakMilestone(days)
                   return (
                     <button
                       key={h.id}
                       onClick={() => onNavigate("habits")}
-                      className="hover:bg-muted -mx-2 flex w-[calc(100%+1rem)] cursor-pointer items-center gap-3 rounded-2xl px-2 py-2 text-left transition-all duration-200 ease-out hover:translate-x-0.5 active:scale-[0.99]"
+                      className="hover:bg-muted flex w-full cursor-pointer items-center gap-3 rounded-lg px-2 py-2 text-left transition-colors duration-150 ease-out"
                     >
-                      <div className="bg-muted text-muted-foreground flex size-10 items-center justify-center rounded-2xl">
-                        <Flame className="size-4" />
-                      </div>
+                      <RadialChart
+                        value={Math.min(1, days / next)}
+                        size={44}
+                        thickness={4}
+                        fgClassName="stroke-orange-400"
+                      >
+                        <Flame className="text-muted-foreground size-3.5" />
+                      </RadialChart>
                       <div className="min-w-0 flex-1">
                         <div className="truncate text-sm font-medium">{h.name}</div>
                         <div className="text-muted-foreground text-xs">
-                          Mejor racha: {h.bestStreak} d
+                          Mejor racha: {Math.max(h.bestStreak, days)} d
                         </div>
                       </div>
                       <div className="text-right">
@@ -269,7 +313,7 @@ export function OverviewView({
         </CardHeader>
         <CardContent>
           {activeProjects.length === 0 ? (
-            <EmptyState
+            <SmallEmpty
               title="Sin proyectos activos"
               hint="Define en qué quieres invertir tu energía."
               action={
@@ -283,28 +327,51 @@ export function OverviewView({
               {activeProjects.map((p) => {
                 const projTasks = store.tasks.filter((t) => t.projectId === p.id)
                 const completed = projTasks.filter((t) => t.done).length
-                const pct =
-                  projTasks.length === 0 ? 0 : (completed / projTasks.length) * 100
+                const frac =
+                  projTasks.length === 0 ? 0 : completed / projTasks.length
                 return (
                   <button
                     key={p.id}
                     onClick={() => onNavigate("projects")}
-                    className="bg-muted/50 hover:bg-muted group/proj cursor-pointer rounded-2xl p-4 text-left transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]"
+                    className="hover:bg-muted/60 group/proj flex cursor-pointer items-center gap-4 rounded-lg border p-4 text-left transition-colors duration-150 ease-out"
                   >
-                    <div className="flex items-center gap-2">
-                      <span className={`size-2.5 rounded-full ${colorClass(p.color)}`} />
-                      <span className="truncate text-sm font-medium">{p.name}</span>
-                    </div>
-                    {p.description && (
-                      <p className="text-muted-foreground mt-1.5 line-clamp-2 text-xs">
-                        {p.description}
-                      </p>
-                    )}
-                    <div className="mt-4 flex items-center gap-2">
-                      <Progress value={pct} className="h-1 flex-1" />
-                      <span className="text-muted-foreground text-xs tabular-nums">
-                        {completed}/{projTasks.length}
+                    <RadialChart
+                      value={frac}
+                      size={56}
+                      thickness={6}
+                      fgClassName={
+                        p.color === "blush"
+                          ? "stroke-pink-400"
+                          : p.color === "lavender"
+                            ? "stroke-violet-400"
+                            : p.color === "peach"
+                              ? "stroke-orange-300"
+                              : p.color === "sky"
+                                ? "stroke-sky-400"
+                                : p.color === "sand"
+                                  ? "stroke-amber-400"
+                                  : "stroke-emerald-400"
+                      }
+                    >
+                      <span className="text-[10px] font-semibold tabular-nums">
+                        {Math.round(frac * 100)}%
                       </span>
+                    </RadialChart>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`size-2 rounded-full ${colorClass(p.color)}`}
+                        />
+                        <span className="truncate text-sm font-medium">{p.name}</span>
+                      </div>
+                      {p.description && (
+                        <p className="text-muted-foreground mt-1 line-clamp-2 text-xs">
+                          {p.description}
+                        </p>
+                      )}
+                      <div className="text-muted-foreground mt-1.5 text-xs tabular-nums">
+                        {completed}/{projTasks.length} tareas
+                      </div>
                     </div>
                   </button>
                 )
@@ -317,34 +384,42 @@ export function OverviewView({
   )
 }
 
-function StatCard({
+function RadialStat({
   icon,
   label,
   value,
-  unit,
+  big,
+  small,
+  fgClassName,
+  onClick,
 }: {
   icon: React.ReactNode
   label: string
-  value: string
-  unit: string
+  value: number
+  big: string
+  small: string
+  fgClassName: string
+  onClick?: () => void
 }) {
   return (
     <Card
       size="sm"
-      className="lift-on-hover hover:shadow-[0_2px_4px_rgb(0_0_0/0.04),0_12px_28px_-12px_rgb(0_0_0/0.10)]"
+      className="lift-on-hover cursor-pointer"
+      onClick={onClick}
+      role="button"
     >
       <CardContent>
-        <div className="flex items-start gap-3">
-          <div className="bg-muted text-muted-foreground group-hover/card:bg-primary/10 group-hover/card:text-primary flex size-9 shrink-0 items-center justify-center rounded-2xl transition-colors duration-200">
-            {icon}
-          </div>
-          <div className="min-w-0">
+        <div className="flex items-center gap-4">
+          <RadialChart value={value} size={66} thickness={7} fgClassName={fgClassName}>
+            <span className="text-muted-foreground">{icon}</span>
+          </RadialChart>
+          <div className="min-w-0 flex-1">
             <div className="text-muted-foreground text-xs">{label}</div>
             <div className="mt-1 flex items-baseline gap-1">
               <span className="font-heading text-2xl font-semibold tabular-nums">
-                {value}
+                {big}
               </span>
-              <span className="text-muted-foreground text-xs">{unit}</span>
+              <span className="text-muted-foreground text-xs">{small}</span>
             </div>
           </div>
         </div>
@@ -353,7 +428,7 @@ function StatCard({
   )
 }
 
-function EmptyState({
+function SmallEmpty({
   title,
   hint,
   action,

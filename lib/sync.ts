@@ -4,10 +4,13 @@ import * as React from "react"
 import type {
   Event,
   Habit,
+  HealthGoal,
   Project,
-  Reminder,
+  Recipe,
   RoutineBlock,
+  SleepEntry,
   Task,
+  WeightEntry,
 } from "./types"
 import { replaceSnapshot } from "./storage"
 
@@ -25,8 +28,11 @@ type Snapshot = {
   projects: Project[]
   habits: Habit[]
   routine: RoutineBlock[]
-  reminders: Reminder[]
   events: Event[]
+  recipes: Recipe[]
+  sleep: SleepEntry[]
+  weight: WeightEntry[]
+  healthGoal: HealthGoal
 }
 
 const ALPHABET = "abcdefghjkmnpqrstuvwxyz23456789"

@@ -3,14 +3,15 @@
 import * as React from "react"
 import {
   Activity,
-  Bell,
   CalendarDays,
+  ChefHat,
   CircleAlert,
   CircleCheck,
   Cloud,
   CloudOff,
   Flame,
   FolderKanban,
+  HeartPulse,
   LayoutDashboard,
   ListTodo,
   Loader2,
@@ -39,7 +40,8 @@ import { TodayView } from "@/components/views/today"
 import { TasksView } from "@/components/views/tasks"
 import { ProjectsView } from "@/components/views/projects"
 import { HabitsView } from "@/components/views/habits"
-import { RemindersView } from "@/components/views/reminders"
+import { RecipesView } from "@/components/views/recipes"
+import { HealthView } from "@/components/views/health"
 import { SpaceDialog } from "@/components/dialogs/space-dialog"
 import { InstallButton } from "@/components/install-button"
 
@@ -52,11 +54,12 @@ type NavItem = {
 
 const NAV: NavItem[] = [
   { id: "overview", label: "Resumen", icon: LayoutDashboard, hint: "Tu día en una vista" },
-  { id: "today", label: "Hoy", icon: CalendarDays, hint: "Rutina y tareas de hoy" },
+  { id: "today", label: "Hoy", icon: CalendarDays, hint: "Calendario y tareas de hoy" },
   { id: "tasks", label: "Tareas", icon: ListTodo, hint: "Todo lo que tienes que hacer" },
   { id: "projects", label: "Proyectos", icon: FolderKanban, hint: "En qué inviertes tu tiempo" },
   { id: "habits", label: "Hábitos", icon: Flame, hint: "Rachas para dejar adicciones" },
-  { id: "reminders", label: "Recordatorios", icon: Bell, hint: "Notificaciones a la hora" },
+  { id: "recipes", label: "Recetas", icon: ChefHat, hint: "Comidas que vale la pena hacer" },
+  { id: "health", label: "Salud", icon: HeartPulse, hint: "Sueño, peso y tu cuerpo" },
 ]
 
 export function Dashboard() {
@@ -72,16 +75,22 @@ export function Dashboard() {
       projects: store.projects,
       habits: store.habits,
       routine: store.routine,
-      reminders: store.reminders,
       events: store.events,
+      recipes: store.recipes,
+      sleep: store.sleep,
+      weight: store.weight,
+      healthGoal: store.healthGoal,
     }),
     [
       store.tasks,
       store.projects,
       store.habits,
       store.routine,
-      store.reminders,
       store.events,
+      store.recipes,
+      store.sleep,
+      store.weight,
+      store.healthGoal,
     ],
   )
   const sync = useSpaceSync({ code, hydrated: store.hydrated, snapshot })
@@ -99,7 +108,7 @@ export function Dashboard() {
   const Hint = NAV.find((n) => n.id === view)?.hint ?? ""
 
   return (
-    <div className="bg-background text-foreground flex min-h-svh">
+    <div className="bg-background text-foreground flex min-h-svh overflow-x-clip">
       <aside
         className={cn(
           "bg-sidebar text-sidebar-foreground border-sidebar-border fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r transition-transform md:static md:translate-x-0",
@@ -139,13 +148,13 @@ export function Dashboard() {
                   setMobileOpen(false)
                 }}
                 className={cn(
-                  "group flex w-full cursor-pointer items-center gap-3 rounded-2xl px-3 py-2 text-left text-sm transition-all duration-200 ease-out hover:translate-x-0.5 active:scale-[0.98]",
+                  "group flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition-colors duration-150 ease-out",
                   active
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
                     : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
                 )}
               >
-                <Icon className="size-4 shrink-0 transition-transform group-hover:scale-110" />
+                <Icon className="size-4 shrink-0" />
                 <span className="font-medium">{item.label}</span>
               </button>
             )
@@ -180,7 +189,7 @@ export function Dashboard() {
         />
       )}
 
-      <main className="flex min-w-0 flex-1 flex-col">
+      <main className="flex min-w-0 flex-1 flex-col overflow-x-clip">
         <header className="bg-background/80 sticky top-0 z-20 flex items-center gap-3 px-4 py-3 backdrop-blur md:px-8">
           <Button
             variant="ghost"
@@ -202,13 +211,13 @@ export function Dashboard() {
           <ThemeToggle />
         </header>
 
-        <div className="flex-1 px-4 py-6 md:px-8 md:py-8">
+        <div className="min-w-0 flex-1 px-4 py-6 md:px-8 md:py-8">
           {!store.hydrated ? (
             <div className="text-muted-foreground animate-fade-in text-sm">
               Cargando…
             </div>
           ) : (
-            <div key={view} className="animate-fade-in">
+            <div key={view} className="animate-fade-in min-w-0">
               {view === "overview" ? (
                 <OverviewView store={store} onNavigate={setView} />
               ) : view === "today" ? (
@@ -219,8 +228,10 @@ export function Dashboard() {
                 <ProjectsView store={store} />
               ) : view === "habits" ? (
                 <HabitsView store={store} />
+              ) : view === "recipes" ? (
+                <RecipesView store={store} />
               ) : (
-                <RemindersView store={store} />
+                <HealthView store={store} />
               )}
             </div>
           )}

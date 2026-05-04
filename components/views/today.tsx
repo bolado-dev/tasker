@@ -235,7 +235,7 @@ export function TodayView({ store }: { store: Store }) {
               <button
                 key={`${t.id}::${t.instanceDate}`}
                 onClick={() => toggleTaskInstance(t.id, t.instanceDate, !t.done)}
-                className="bg-card hover:bg-accent flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-1.5 transition-all duration-150 hover:scale-[1.03] active:scale-95"
+                className="bg-card hover:bg-accent flex cursor-pointer items-center gap-2 rounded-lg border px-2.5 py-1.5 transition-colors duration-150"
               >
                 <Checkbox
                   checked={t.done}

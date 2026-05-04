@@ -1,4 +1,4 @@
-const VERSION = "tasker-v2"
+const VERSION = "tasker-v3"
 const SHELL = ["/", "/manifest.webmanifest", "/icon.svg", "/icon-192.png", "/icon-512.png"]
 
 self.addEventListener("install", (event) => {
@@ -15,44 +15,6 @@ self.addEventListener("activate", (event) => {
         Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k))),
       )
       .then(() => self.clients.claim()),
-  )
-})
-
-self.addEventListener("push", (event) => {
-  let payload = {}
-  try {
-    payload = event.data ? event.data.json() : {}
-  } catch {
-    payload = { title: "Tasker", body: event.data ? event.data.text() : "" }
-  }
-  const title = payload.title || "Tasker"
-  const options = {
-    body: payload.body || "",
-    icon: "/icon-192.png",
-    badge: "/icon-192.png",
-    tag: payload.tag || "tasker",
-    renotify: true,
-    data: { url: payload.url || "/" },
-    vibrate: [120, 60, 120],
-  }
-  event.waitUntil(self.registration.showNotification(title, options))
-})
-
-self.addEventListener("notificationclick", (event) => {
-  event.notification.close()
-  const target = (event.notification.data && event.notification.data.url) || "/"
-  event.waitUntil(
-    self.clients
-      .matchAll({ type: "window", includeUncontrolled: true })
-      .then((all) => {
-        for (const client of all) {
-          if ("focus" in client) {
-            client.navigate(target)
-            return client.focus()
-          }
-        }
-        if (self.clients.openWindow) return self.clients.openWindow(target)
-      }),
   )
 })
 

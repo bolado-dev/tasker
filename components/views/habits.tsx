@@ -142,7 +142,7 @@ export function HabitsView({ store }: { store: Store }) {
               <Card
                 key={h.id}
                 size="default"
-                className="lift-on-hover hover:shadow-[0_2px_4px_rgb(0_0_0/0.04),0_16px_36px_-12px_rgb(0_0_0/0.12)]"
+                className="lift-on-hover"
               >
                 <CardHeader>
                   <div className="flex items-start justify-between gap-3">
@@ -207,7 +207,7 @@ export function HabitsView({ store }: { store: Store }) {
 
                   <Separator className="my-4" />
 
-                  <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center justify-between gap-2 text-xs">
                     <span className="text-muted-foreground inline-flex items-center gap-1.5">
                       <TrendingUp className="size-3" />
                       Mejor racha:{" "}
@@ -222,7 +222,7 @@ export function HabitsView({ store }: { store: Store }) {
                       onClick={() => setRelapsing(h)}
                     >
                       <RotateCcw />
-                      Recaí
+                      {h.type === "quit" ? "Recaí" : "Reiniciar"}
                     </Button>
                   </div>
                 </CardContent>
@@ -246,10 +246,13 @@ export function HabitsView({ store }: { store: Store }) {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Volver a empezar</DialogTitle>
+            <DialogTitle>
+              {relapsing?.type === "quit" ? "Volver a empezar" : "Reiniciar racha"}
+            </DialogTitle>
             <DialogDescription>
-              Recaer no borra los días que llevabas — son experiencia. Tu mejor racha se
-              guarda. ¿Reiniciamos el contador a hoy?
+              {relapsing?.type === "quit"
+                ? "Recaer no borra los días que llevabas — son experiencia. Tu mejor racha se guarda. ¿Reiniciamos el contador a hoy?"
+                : "Si fallaste un día, no pasa nada. Tu mejor racha queda guardada. ¿Reiniciamos el contador a hoy?"}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

@@ -2,6 +2,12 @@ export type Priority = "low" | "med" | "high"
 
 export type Repeat = "none" | "daily" | "weekly"
 
+export type Subtask = {
+  id: string
+  title: string
+  done: boolean
+}
+
 export type TaskInstanceOverride = {
   done?: boolean
   skipped?: boolean
@@ -21,6 +27,7 @@ export type Task = {
   repeat?: Repeat
   repeatUntil?: string
   instances?: Record<string, TaskInstanceOverride>
+  subtasks?: Subtask[]
   createdAt: number
   completedAt?: number
 }
@@ -91,22 +98,46 @@ export type View =
   | "tasks"
   | "projects"
   | "habits"
-  | "reminders"
+  | "recipes"
+  | "health"
 
-export type ReminderRepeat = "once" | "daily" | "weekdays" | "weekly"
-
-export type Reminder = {
+export type Recipe = {
   id: string
   title: string
-  body?: string
-  time: string
-  date?: string
-  weekday?: number
-  repeat: ReminderRepeat
-  enabled: boolean
-  lastFiredAt?: number
-  nextFireAt: number
+  description?: string
+  ingredients: string[]
+  steps: string[]
+  prepMin?: number
+  cookMin?: number
+  servings?: number
+  tags: string[]
+  imageUrl?: string
+  favorite?: boolean
   createdAt: number
+}
+
+export type SleepEntry = {
+  id: string
+  date: string
+  bedtime?: string
+  wakeTime?: string
+  hours: number
+  quality: 1 | 2 | 3 | 4 | 5
+  notes?: string
+  createdAt: number
+}
+
+export type WeightEntry = {
+  id: string
+  date: string
+  kg: number
+  notes?: string
+  createdAt: number
+}
+
+export type HealthGoal = {
+  weightKg?: number
+  sleepHours?: number
 }
 
 export const PROJECT_COLORS = [
